@@ -17,10 +17,15 @@ class Interpreter:
             return Token(EOF, None)
 
         current_char = text[self.pos]
+
+        token_start_index = self.pos
         self.pos += 1
 
         if current_char.isdigit():
-            return Token(INTEGER, int(current_char))
+            while self.pos < len(text) and text[self.pos].isdigit():
+                self.pos += 1
+
+            return Token(INTEGER, int(text[token_start_index:self.pos]))
         elif current_char == "+":
             return Token(PLUS, current_char)
 
