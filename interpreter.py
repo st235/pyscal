@@ -13,6 +13,9 @@ class Interpreter:
     def get_next_token(self):
         text = self.text
 
+        while self.pos < len(text) and text[self.pos].isspace():
+            self.pos += 1
+
         if self.pos >= len(text):
             return Token(EOF, None)
 
