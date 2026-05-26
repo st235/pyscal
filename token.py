@@ -1,4 +1,7 @@
-INTEGER, PLUS, EOF = 'INTEGER', 'PLUS', 'EOF'
+TOKEN_TYPE_INTEGER = "INTEGER"
+TOKEN_TYPE_PLUS = "PLUS"
+TOKEN_TYPE_MINUS = "MINUS"
+TOKEN_TYPE_EOF = "EOF"
 
 class Token:
     def __init__(self, type, value):
