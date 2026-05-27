@@ -6,35 +6,46 @@ class Interpreter:
         self.text = text
         self.pos = 0
         self.current_token: Optional[Token] = None
+        self.current_char: Optional[str] = self.text[self.pos]
 
     def error(self):
         raise Exception("Cannot parse input.")
 
+    def advance(self):
+        self.pos += 1
+        if self.pos >= len(self.text):
+            self.current_char = None
+        else:
+            self.current_char = self.text[self.pos]
+
+    def skip_whitespaces(self):
+        while self.current_char is not None and self.current_char.isspace():
+            self.advance()
+
+    def integer(self) -> int:
+        token_start_index = self.pos
+        while self.current_char is not None and self.current_char.isdigit():
+            self.advance()
+        return int(self.text[token_start_index:self.pos])
+
     def get_next_token(self):
-        text = self.text
 
-        while self.pos < len(text) and text[self.pos].isspace():
-            self.pos += 1
+        self.skip_whitespaces()
 
-        if self.pos >= len(text):
+        if self.current_char is None:
             return Token(TOKEN_TYPE_EOF, None)
 
-        current_char = text[self.pos]
-
-        token_start_index = self.pos
-        self.pos += 1
-
-        if current_char.isdigit():
-            while self.pos < len(text) and text[self.pos].isdigit():
-                self.pos += 1
-
-            return Token(TOKEN_TYPE_INTEGER, int(text[token_start_index:self.pos]))
-        elif current_char == "+":
-            return Token(TOKEN_TYPE_PLUS, current_char)
-        elif current_char == "-":
-            return Token(TOKEN_TYPE_MINUS, current_char)
+        if self.current_char.isdigit():
+            return Token(TOKEN_TYPE_INTEGER, self.integer())
+        elif self.current_char == "+":
+            self.advance()
+            return Token(TOKEN_TYPE_PLUS, self.current_char)
+        elif self.current_char == "-":
+            self.advance()
+            return Token(TOKEN_TYPE_MINUS, self.current_char)
 
         self.error()
+        return None
 
     def consume(self, token_type):
         if self.current_token.type == token_type:
