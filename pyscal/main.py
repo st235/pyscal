@@ -1,4 +1,4 @@
-from interpreter import Interpreter
+from pyscal.interpreter import Interpreter
 
 def main():
     while True:

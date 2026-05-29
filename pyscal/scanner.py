@@ -1,4 +1,5 @@
-from token import *
+from pyscal.token import *
+
 from typing import Optional
 
 class Scanner:

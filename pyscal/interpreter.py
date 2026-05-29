@@ -1,5 +1,5 @@
-from scanner import Scanner
-from lexer import Lexer
+from pyscal.scanner import Scanner
+from pyscal.lexer import Lexer
 
 class Interpreter:
     def __init__(self, text: str):

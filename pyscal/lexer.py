@@ -1,5 +1,5 @@
-from scanner import Scanner
-from token import *
+from pyscal.scanner import Scanner
+from pyscal.token import *
 from typing import Optional
 
 class Lexer:
@@ -33,18 +33,18 @@ class Lexer:
     def term(self) -> int:
         left = self.factor()
 
-        op = self.__current_token
-        if not (self.match(TOKEN_TYPE_PLUS) or
-            self.match(TOKEN_TYPE_MINUS)):
-            self.error()
+        while self.__current_token.type in (TOKEN_TYPE_PLUS, TOKEN_TYPE_MINUS):
+            op = self.__current_token
+            self.match(TOKEN_TYPE_PLUS) or self.match(TOKEN_TYPE_MINUS)
 
-        right = self.factor()
+            right = self.factor()
 
-        if op.type == TOKEN_TYPE_PLUS:
-            result = left + right
-        elif op.type == TOKEN_TYPE_MINUS:
-            result = left - right
-        return result
+            if op.type == TOKEN_TYPE_PLUS:
+                left = left + right
+            elif op.type == TOKEN_TYPE_MINUS:
+                left = left - right
+
+        return left
 
     def factor(self) -> int:
         left = self.__current_token.value
