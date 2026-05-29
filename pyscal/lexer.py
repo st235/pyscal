@@ -5,7 +5,7 @@ from typing import Optional
 class Lexer:
     def __init__(self, scanner: Scanner):
         self.__scanner: Scanner = scanner
-        self.__current_token: Optional[Token] = None
+        self.__current_token: Optional[Token] = self.__scanner.get_next_token()
 
     def error(self):
         raise Exception("Cannot parse input.")
@@ -26,8 +26,12 @@ class Lexer:
     def check(self, token_type) -> bool:
         return self.__current_token.type == token_type
 
+    def parse(self):
+        result = self.expr()
+        self.consume(TOKEN_TYPE_EOF)
+        return result
+
     def expr(self) -> int:
-        self.__current_token = self.__scanner.get_next_token()
         return self.term()
 
     def term(self) -> int:
@@ -47,19 +51,27 @@ class Lexer:
         return left
 
     def factor(self) -> int:
-        left = self.__current_token.value
-        self.consume(TOKEN_TYPE_INTEGER)
+        left = self.integer()
 
         while self.__current_token.type in (TOKEN_TYPE_STAR, TOKEN_TYPE_SLASH):
             op = self.__current_token
             self.match(TOKEN_TYPE_STAR) or self.match(TOKEN_TYPE_SLASH)
 
-            right = self.__current_token.value
-            self.consume(TOKEN_TYPE_INTEGER)
+            right = self.integer()
 
             if op.type == TOKEN_TYPE_STAR:
                 left = left * right
             elif op.type == TOKEN_TYPE_SLASH:
-                left = left / right
+                left = left // right
 
         return left
+
+    def integer(self) -> int:
+        if self.check(TOKEN_TYPE_INTEGER):
+            result = self.__current_token.value
+            self.consume(TOKEN_TYPE_INTEGER)
+        else:
+            self.consume(TOKEN_TYPE_LEFT_PAREN)
+            result = self.expr()
+            self.consume(TOKEN_TYPE_RIGHT_PAREN)
+        return result

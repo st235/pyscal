@@ -48,6 +48,12 @@ class Scanner:
         elif self.__current_char == "/":
             self.advance()
             return Token(TOKEN_TYPE_SLASH, self.__current_char)
+        elif self.__current_char == "(":
+            self.advance()
+            return Token(TOKEN_TYPE_LEFT_PAREN, self.__current_char)
+        elif self.__current_char == ")":
+            self.advance()
+            return Token(TOKEN_TYPE_RIGHT_PAREN, self.__current_char)
 
         self.error()
         return None

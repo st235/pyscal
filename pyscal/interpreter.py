@@ -6,4 +6,4 @@ class Interpreter:
         self.__lexer = Lexer(Scanner(text))
 
     def expr(self) -> int:
-        return self.__lexer.expr()
+        return self.__lexer.parse()
