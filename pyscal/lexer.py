@@ -1,5 +1,7 @@
 from pyscal.scanner import Scanner
 from pyscal.token import *
+from pyscal.tree import AST, BinaryOp, Number
+
 from typing import Optional
 
 class Lexer:
@@ -31,44 +33,33 @@ class Lexer:
         self.consume(TOKEN_TYPE_EOF)
         return result
 
-    def expr(self) -> int:
+    def expr(self) -> AST:
         return self.term()
 
-    def term(self) -> int:
+    def term(self) -> AST:
         left = self.factor()
 
         while self.__current_token.type in (TOKEN_TYPE_PLUS, TOKEN_TYPE_MINUS):
             op = self.__current_token
             self.match(TOKEN_TYPE_PLUS) or self.match(TOKEN_TYPE_MINUS)
 
-            right = self.factor()
-
-            if op.type == TOKEN_TYPE_PLUS:
-                left = left + right
-            elif op.type == TOKEN_TYPE_MINUS:
-                left = left - right
+            left = BinaryOp(left, op, self.factor())
 
         return left
 
-    def factor(self) -> int:
-        left = self.integer()
+    def factor(self) -> AST:
+        left = self.primary()
 
         while self.__current_token.type in (TOKEN_TYPE_STAR, TOKEN_TYPE_SLASH):
             op = self.__current_token
             self.match(TOKEN_TYPE_STAR) or self.match(TOKEN_TYPE_SLASH)
-
-            right = self.integer()
-
-            if op.type == TOKEN_TYPE_STAR:
-                left = left * right
-            elif op.type == TOKEN_TYPE_SLASH:
-                left = left // right
+            left = BinaryOp(left, op, self.primary())
 
         return left
 
-    def integer(self) -> int:
+    def primary(self) -> AST:
         if self.check(TOKEN_TYPE_INTEGER):
-            result = self.__current_token.value
+            result = Number(self.__current_token)
             self.consume(TOKEN_TYPE_INTEGER)
         else:
             self.consume(TOKEN_TYPE_LEFT_PAREN)
