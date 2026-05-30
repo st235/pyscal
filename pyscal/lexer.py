@@ -1,6 +1,6 @@
 from pyscal.scanner import Scanner
 from pyscal.token import *
-from pyscal.tree import AST, BinaryOp, Number
+from pyscal.tree import AST, BinaryOp, Number, UnaryOp
 
 from typing import Optional
 
@@ -61,8 +61,15 @@ class Lexer:
         if self.check(TOKEN_TYPE_INTEGER):
             result = Number(self.__current_token)
             self.consume(TOKEN_TYPE_INTEGER)
-        else:
-            self.consume(TOKEN_TYPE_LEFT_PAREN)
+        elif self.match(TOKEN_TYPE_LEFT_PAREN):
             result = self.expr()
             self.consume(TOKEN_TYPE_RIGHT_PAREN)
+        else:
+            op = self.__current_token
+
+            if not self.match(TOKEN_TYPE_PLUS):
+                self.consume(TOKEN_TYPE_MINUS)
+
+            result = UnaryOp(self.primary(), op)
+
         return result

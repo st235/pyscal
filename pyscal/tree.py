@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from pyscal.token import Token
 
+
 class AST(ABC):
 
     @abstractmethod
@@ -17,6 +18,16 @@ class BinaryOp(AST):
 
     def visit(self, visitor: "Visitor"):
         return visitor.visitBinaryOp(self)
+
+
+class UnaryOp(AST):
+    def __init__(self, left: AST, op: Token):
+        self.left = left
+        self.op = op
+
+    def visit(self, visitor: "Visitor"):
+        return visitor.visitUnaryOp(self)
+
 
 class Number(AST):
     def __init__(self, token: Token):
