@@ -1,12 +1,13 @@
 from pyscal.scanner import Scanner
 from pyscal.lexer import Lexer
-from pyscal.tree import BinaryOp, Number, UnaryOp
+from pyscal.tree import BinaryOp, Number, UnaryOp, Compound, Assign, NoOp, Var
 from pyscal.visitor import Visitor
 from pyscal.token import *
 
 class Interpreter(Visitor):
     def __init__(self, text: str):
         self.__lexer = Lexer(Scanner(text))
+        self.__globals = {}
 
     def expr(self) -> int:
         ast = self.__lexer.parse()
@@ -39,4 +40,23 @@ class Interpreter(Visitor):
 
     def visitNumber(self, node: Number):
         return node.token.value
+
+    def visitCompound(self, node: Compound):
+        for statement in node.statements:
+            statement.visit(self)
+
+    def visitNoOp(self, node: NoOp):
+        pass
+
+    def visitAssign(self, node: Assign):
+        self.__globals[node.left.value] = node.right.visit(self)
+
+    def visitVar(self, node: Var):
+        return self.__globals[node.token.value]
+
+    def __repr__(self):
+        return f"globals: {self.__globals}"
+
+    def __str__(self):
+        return repr(self)
 

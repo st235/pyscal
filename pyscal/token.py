@@ -1,3 +1,5 @@
+from typing import Any, Optional
+
 TOKEN_TYPE_INTEGER = "INTEGER"
 TOKEN_TYPE_PLUS = "PLUS"
 TOKEN_TYPE_MINUS = "MINUS"
@@ -6,9 +8,15 @@ TOKEN_TYPE_SLASH = "SLASH"
 TOKEN_TYPE_LEFT_PAREN = "LEFT_PAREN"
 TOKEN_TYPE_RIGHT_PAREN = "RIGHT_PAREN"
 TOKEN_TYPE_EOF = "EOF"
+TOKEN_TYPE_BEGIN = "BEGIN"
+TOKEN_TYPE_END = "END"
+TOKEN_TYPE_DOT = "DOT"
+TOKEN_TYPE_ID = "ID"
+TOKEN_TYPE_ASSIGN = "ASSIGN"
+TOKEN_TYPE_SEMI = "SEMI"
 
 class Token:
-    def __init__(self, type: str, value: int):
+    def __init__(self, type: str, value: Optional[Any]):
         self.type = type
         self.value = value
 

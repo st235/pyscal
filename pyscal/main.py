@@ -13,6 +13,7 @@ def main():
         interpreter = Interpreter(text)
         result = interpreter.expr()
         print(result)
+        print(interpreter)
 
 if __name__ == "__main__":
     main()
