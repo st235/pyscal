@@ -1,6 +1,6 @@
 from pyscal.scanner import Scanner
 from pyscal.token import *
-from pyscal.tree import AST, BinaryOp, Number, UnaryOp, Compound, NoOp, Assign, Var
+from pyscal.tree import *
 
 from typing import Optional, List
 
@@ -34,11 +34,56 @@ class Lexer:
         return result
 
     def program(self) -> AST:
-        node = self.compound_statement()
-        self.consume(TOKEN_TYPE_DOT)
-        return node
+        self.consume(TOKEN_TYPE_PROGRAM)
 
-    def compound_statement(self) -> AST:
+        variable = self.variable()
+
+        self.consume(TOKEN_TYPE_SEMI)
+
+        block = self.block()
+        self.consume(TOKEN_TYPE_DOT)
+        return Program(variable, block)
+
+    def block(self) -> Block:
+        declarations = self.declarations()
+        compound_statement = self.compound_statement()
+        return Block(declarations, compound_statement)
+
+    def declarations(self) -> List[VarDecl]:
+        if not self.match(TOKEN_TYPE_VAR):
+            return []
+
+        out = [self.variable_declaration()]
+        self.consume(TOKEN_TYPE_SEMI)
+
+        while self.check(TOKEN_TYPE_ID):
+            out.append(self.variable_declaration())
+            self.consume(TOKEN_TYPE_SEMI)
+
+        return out
+
+
+    def variable_declaration(self) -> VarDecl:
+        ids = [self.__current_token]
+        self.consume(TOKEN_TYPE_ID)
+
+        while self.match(TOKEN_TYPE_COMMA):
+            ids.append(self.__current_token)
+            self.consume(TOKEN_TYPE_ID)
+
+        self.consume(TOKEN_TYPE_COLON)
+        type = self.type_spec()
+        return VarDecl(ids, type)
+
+    def type_spec(self) -> Type:
+        type = self.__current_token
+        if self.match(TOKEN_TYPE_INTEGER):
+            return Type(type)
+        else:
+            self.consume(TOKEN_TYPE_REAL)
+            return Type(type)
+
+    def compound_statement(self) -> Compound:
         self.consume(TOKEN_TYPE_BEGIN)
         compound = Compound(self.statement_list())
         self.consume(TOKEN_TYPE_END)
@@ -70,6 +115,11 @@ class Lexer:
     def empty(self) -> AST:
         return NoOp()
 
+    def variable(self) -> Var:
+        var = self.__current_token
+        self.consume(TOKEN_TYPE_ID)
+        return Var(var)
+
     def expr(self) -> AST:
         return self.term()
 
@@ -87,18 +137,30 @@ class Lexer:
     def factor(self) -> AST:
         left = self.primary()
 
-        while self.__current_token.type in (TOKEN_TYPE_STAR, TOKEN_TYPE_SLASH):
+        while self.__current_token.type in (TOKEN_TYPE_STAR, TOKEN_TYPE_SLASH, TOKEN_TYPE_INTEGER_DIV):
             op = self.__current_token
-            self.match(TOKEN_TYPE_STAR) or self.match(TOKEN_TYPE_SLASH)
+
+            if self.check(TOKEN_TYPE_STAR):
+                self.consume(TOKEN_TYPE_STAR)
+            elif self.check(TOKEN_TYPE_SLASH):
+                self.consume(TOKEN_TYPE_SLASH)
+            elif self.check(TOKEN_TYPE_INTEGER_DIV):
+                self.consume(TOKEN_TYPE_INTEGER_DIV)
+            else:
+                self.error()
+
             left = BinaryOp(left, op, self.primary())
 
         return left
 
     def primary(self) -> AST:
         prev = self.__current_token
-        if self.check(TOKEN_TYPE_INTEGER):
+        if self.check(TOKEN_TYPE_INTEGER_CONST):
             result = Number(self.__current_token)
-            self.consume(TOKEN_TYPE_INTEGER)
+            self.consume(TOKEN_TYPE_INTEGER_CONST)
+        elif self.check(TOKEN_TYPE_REAL_CONST):
+            result = Number(self.__current_token)
+            self.consume(TOKEN_TYPE_REAL_CONST)
         elif self.match(TOKEN_TYPE_LEFT_PAREN):
             result = self.expr()
             self.consume(TOKEN_TYPE_RIGHT_PAREN)
@@ -107,7 +169,6 @@ class Lexer:
         elif self.match(TOKEN_TYPE_MINUS):
             result = UnaryOp(self.primary(), prev)
         else:
-            self.consume(TOKEN_TYPE_ID)
-            return Var(prev)
+            result = self.variable()
 
         return result

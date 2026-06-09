@@ -65,3 +65,36 @@ class Var(AST):
 
     def visit(self, visitor: "Visitor"):
         return visitor.visitVar(self)
+
+class Type(AST):
+    def __init__(self, token: Token):
+        self.token = token
+        self.name: str = token.value
+
+    def visit(self, visitor: "Visitor"):
+        return visitor.visitType(self)
+
+class VarDecl(AST):
+    def __init__(self, ids: List[Token], type: Type):
+        self.ids = ids
+        self.type = type
+
+    def visit(self, visitor: "Visitor"):
+        return visitor.visitVarDecl(self)
+
+class Block(AST):
+    def __init__(self, var_decls: List[VarDecl], compound: Compound):
+        self.var_decls = var_decls
+        self.compound = compound
+
+    def visit(self, visitor: "Visitor"):
+        return visitor.visitBlock(self)
+
+class Program(AST):
+    def __init__(self, name: Var, block: Block):
+        self.name = name
+        self.block = block
+
+    def visit(self, visitor: "Visitor"):
+        return visitor.visitProgram(self)
+

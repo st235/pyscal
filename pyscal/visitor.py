@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from pyscal.tree import BinaryOp, UnaryOp, Number, Compound, NoOp, Assign, Var
+from pyscal.tree import *
 
 
 class Visitor(ABC):
@@ -32,3 +32,21 @@ class Visitor(ABC):
     @abstractmethod
     def visitVar(self, node: Var):
         ...
+
+    @abstractmethod
+    def visitProgram(self, node: Program):
+        ...
+
+    @abstractmethod
+    def visitBlock(self, node: Block):
+        ...
+
+
+    @abstractmethod
+    def visitVarDecl(self, node: VarDecl):
+        ...
+
+    @abstractmethod
+    def visitType(self, node: Type):
+        ...
+

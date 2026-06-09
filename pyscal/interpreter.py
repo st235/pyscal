@@ -1,6 +1,6 @@
 from pyscal.scanner import Scanner
 from pyscal.lexer import Lexer
-from pyscal.tree import BinaryOp, Number, UnaryOp, Compound, Assign, NoOp, Var
+from pyscal.tree import BinaryOp, Number, UnaryOp, Compound, Assign, NoOp, Var, Block, Program, Type, VarDecl
 from pyscal.visitor import Visitor
 from pyscal.token import *
 
@@ -24,6 +24,8 @@ class Interpreter(Visitor):
         elif node.op.type == TOKEN_TYPE_STAR:
             return left * right
         elif node.op.type == TOKEN_TYPE_SLASH:
+            return left / right
+        elif node.op.type == TOKEN_TYPE_INTEGER_DIV:
             return left // right
         else:
             raise Exception("Unsupported binary op.")
@@ -36,7 +38,7 @@ class Interpreter(Visitor):
         elif node.op.type == TOKEN_TYPE_MINUS:
             return -left
         else:
-            raise Exception("Unsuported unary op.")
+            raise Exception("Unsupported unary op.")
 
     def visitNumber(self, node: Number):
         return node.token.value
@@ -54,9 +56,24 @@ class Interpreter(Visitor):
     def visitVar(self, node: Var):
         return self.__globals[node.token.value]
 
+    def visitBlock(self, node: Block):
+        for var_decl in node.var_decls:
+            var_decl.visit(self)
+
+        node.compound.visit(self)
+
+    def visitProgram(self, node: Program):
+        node.block.visit(self)
+
+    def visitType(self, node: Type):
+        return node.name
+
+    def visitVarDecl(self, node: VarDecl):
+        pass
+
     def __repr__(self):
-        return f"globals: {self.__globals}"
+        return str(self)
 
     def __str__(self):
-        return repr(self)
+        return f"globals: {self.__globals}"
 
