@@ -41,7 +41,6 @@ class Visitor(ABC):
     def visitBlock(self, node: Block):
         ...
 
-
     @abstractmethod
     def visitVarDecl(self, node: VarDecl):
         ...

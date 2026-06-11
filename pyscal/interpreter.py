@@ -2,15 +2,18 @@ from pyscal.scanner import Scanner
 from pyscal.lexer import Lexer
 from pyscal.tree import BinaryOp, Number, UnaryOp, Compound, Assign, NoOp, Var, Block, Program, Type, VarDecl
 from pyscal.visitor import Visitor
+from pyscal.symbol_table_builder import SymbolTableBuilder
 from pyscal.token import *
 
 class Interpreter(Visitor):
     def __init__(self, text: str):
         self.__lexer = Lexer(Scanner(text))
+        self.__sym_table_builder = SymbolTableBuilder()
         self.__globals = {}
 
-    def expr(self) -> int:
+    def interpret(self) -> int:
         ast = self.__lexer.parse()
+        ast.visit(self.__sym_table_builder)
         return ast.visit(self)
 
     def visitBinaryOp(self, node: BinaryOp):

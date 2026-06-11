@@ -14,4 +14,4 @@ import pytest
 ])
 def test_parsingExpression_thenCorrectlyParsed(expr, expected):
     interpreter = Interpreter(expr)
-    assert interpreter.expr() == expected
+    assert interpreter.interpret() == expected

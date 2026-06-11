@@ -13,7 +13,7 @@ def __repl():
             continue
 
         interpreter = Interpreter(text)
-        result = interpreter.expr()
+        result = interpreter.interpret()
         print(result)
         print(interpreter)
 
@@ -22,7 +22,7 @@ def __eval_file(file_name: str):
         file = f.read()
 
         interpreter = Interpreter(file)
-        result = interpreter.expr()
+        result = interpreter.interpret()
         print(result)
         print(interpreter)
 
