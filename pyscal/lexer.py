@@ -49,21 +49,42 @@ class Lexer:
         compound_statement = self.compound_statement()
         return Block(declarations, compound_statement)
 
-    def declarations(self) -> List[VarDecl]:
-        if not self.match(TOKEN_TYPE_VAR):
-            return []
+    def declarations(self) -> List[AST]:
+        decls = []
+        while not self.check(TOKEN_TYPE_BEGIN):
+            decls.append(self.declaration())
+        return decls
 
-        out = [self.variable_declaration()]
+    def declaration(self) -> Optional[AST]:
+        if self.match(TOKEN_TYPE_VAR):
+            return self._var_declaration()
+        elif self.match(TOKEN_TYPE_PROCEDURE):
+            return self._procedureDeclaration()
+        else:
+            return None
+
+    def _procedureDeclaration(self) -> ProcedureDecl:
+        name = self.variable()
+        self.consume(TOKEN_TYPE_SEMI)
+
+        block = self.block()
+
+        self.consume(TOKEN_TYPE_SEMI)
+
+        return ProcedureDecl(name, block)
+
+    def _var_declaration(self) -> VarDecl:
+        out = [self.variable_block()]
         self.consume(TOKEN_TYPE_SEMI)
 
         while self.check(TOKEN_TYPE_ID):
-            out.append(self.variable_declaration())
+            out.append(self.variable_block())
             self.consume(TOKEN_TYPE_SEMI)
 
-        return out
+        return VarDecl(out)
 
 
-    def variable_declaration(self) -> VarDecl:
+    def variable_block(self) -> VarBlock:
         ids = [self.__current_token]
         self.consume(TOKEN_TYPE_ID)
 
@@ -73,7 +94,7 @@ class Lexer:
 
         self.consume(TOKEN_TYPE_COLON)
         type = self.type_spec()
-        return VarDecl(ids, type)
+        return VarBlock(ids, type)
 
     def type_spec(self) -> Type:
         type = self.__current_token

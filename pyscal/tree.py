@@ -74,10 +74,17 @@ class Type(AST):
     def visit(self, visitor: "Visitor"):
         return visitor.visitType(self)
 
-class VarDecl(AST):
+class VarBlock(AST):
     def __init__(self, ids: List[Token], type: Type):
         self.ids = ids
         self.type = type
+
+    def visit(self, visitor: "Visitor"):
+        return visitor.visitVarBlock(self)
+
+class VarDecl(AST):
+    def __init__(self, blocks: List[VarBlock]):
+        self.blocks = blocks
 
     def visit(self, visitor: "Visitor"):
         return visitor.visitVarDecl(self)
@@ -98,3 +105,10 @@ class Program(AST):
     def visit(self, visitor: "Visitor"):
         return visitor.visitProgram(self)
 
+class ProcedureDecl(AST):
+    def __init__(self, name: Var, block: Block):
+        self.name = name
+        self.block = block
+
+    def visit(self, visitor: "Visitor"):
+        return visitor.visitProcedure(self)

@@ -22,6 +22,7 @@ TOKEN_TYPE_INTEGER = "INTEGER"
 TOKEN_TYPE_REAL = "REAL"
 TOKEN_TYPE_INTEGER_DIV = "DIV"
 TOKEN_TYPE_PROGRAM = "PROGRAM"
+TOKEN_TYPE_PROCEDURE = "PROCEDURE"
 
 class Token:
     def __init__(self, type: str, value: Optional[Any]):

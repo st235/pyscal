@@ -10,6 +10,7 @@ _PREDEFINED_KEYWORDS_LOOKUP = {
     "integer": TOKEN_TYPE_INTEGER,
     "real": TOKEN_TYPE_REAL,
     "div": TOKEN_TYPE_INTEGER_DIV,
+    "procedure": TOKEN_TYPE_PROCEDURE,
 }
 
 class Scanner:

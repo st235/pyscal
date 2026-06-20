@@ -42,6 +42,10 @@ class Visitor(ABC):
         ...
 
     @abstractmethod
+    def visitVarBlock(self, node: VarBlock):
+        ...
+
+    @abstractmethod
     def visitVarDecl(self, node: VarDecl):
         ...
 
@@ -49,3 +53,6 @@ class Visitor(ABC):
     def visitType(self, node: Type):
         ...
 
+    @abstractmethod
+    def visitProcedure(self, node: ProcedureDecl):
+        ...

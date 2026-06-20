@@ -1,6 +1,7 @@
 from pyscal.scanner import Scanner
 from pyscal.lexer import Lexer
-from pyscal.tree import BinaryOp, Number, UnaryOp, Compound, Assign, NoOp, Var, Block, Program, Type, VarDecl
+from pyscal.tree import BinaryOp, Number, UnaryOp, Compound, Assign, NoOp, Var, Block, Program, Type, VarDecl, VarBlock, \
+    ProcedureDecl
 from pyscal.visitor import Visitor
 from pyscal.symbol_table_builder import SymbolTableBuilder
 from pyscal.token import *
@@ -72,6 +73,12 @@ class Interpreter(Visitor):
         return node.name
 
     def visitVarDecl(self, node: VarDecl):
+        pass
+
+    def visitVarBlock(self, node: VarBlock):
+        pass
+
+    def visitProcedure(self, node: ProcedureDecl):
         pass
 
     def __repr__(self):

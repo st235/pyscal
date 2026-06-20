@@ -44,6 +44,10 @@ class SymbolTableBuilder(Visitor):
         node.compound.visit(self)
 
     def visitVarDecl(self, node: VarDecl):
+        for var_block in node.blocks:
+            var_block.visit(self)
+
+    def visitVarBlock(self, node: VarDecl):
         type_name = node.type.name
         type_symbol = self.__symbol_table.lookup(type_name)
         if type_symbol is None:
@@ -59,4 +63,7 @@ class SymbolTableBuilder(Visitor):
     def visitType(self, node: Type):
         if self.__symbol_table.lookup(node.name) is None:
             raise Exception(f"Unknown type: {node.name}")
+
+    def visitProcedure(self, node: ProcedureDecl):
+        node.block.visit(self)
 
